@@ -1,17 +1,16 @@
 import 'dart:ui';
-import 'package:aplication/Pages/RegisterApp_page.dart';
 import 'package:aplication/Service/UserCache.dart';
 import 'package:aplication/Service/RestService/LoginServiceRest.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'MyHomeApp_page copy.dart';
 
-class LoginApp_page extends StatefulWidget {
+class Register_page extends StatefulWidget {
   @override
-  _LoginApp_page createState() => _LoginApp_page();
+  _RegisterApp_page createState() => _RegisterApp_page();
 }
 
-class _LoginApp_page extends State<LoginApp_page> {
+class _RegisterApp_page extends State<Register_page> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   TextEditingController emailController = TextEditingController();
@@ -50,23 +49,6 @@ class _LoginApp_page extends State<LoginApp_page> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Container(
-                    padding: const EdgeInsets.only(top: 75.0),
-                    child: Image.asset('assets/wwwroot/patinha.png'),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Center(
-                      child: Text(
-                        'IPET',
-                        style: TextStyle(
-                          fontSize: 65,
-                          fontWeight: FontWeight.bold,
-                          color: const Color.fromRGBO(255, 213, 213, 1.0),
-                        ),
-                      ),
-                    ),
-                  ),
                   Expanded(
                     flex: 5,
                     child: Padding(
@@ -108,13 +90,14 @@ class _LoginApp_page extends State<LoginApp_page> {
                                 });
 
                                 if (_formKey.currentState!.validate()) {
-                                  final loginSuccessful =
-                                      await userCache.loginUser(
+                                  // Use the registration function instead of login
+                                  final registrationSuccessful =
+                                      await userCache.RegisterUser(
                                     emailController.text,
                                     passwordController.text,
                                   );
 
-                                  if (loginSuccessful) {
+                                  if (registrationSuccessful) {
                                     Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
                                         builder: (context) => MyHomeApp_page(),
@@ -124,9 +107,9 @@ class _LoginApp_page extends State<LoginApp_page> {
                                     showDialog(
                                       context: context,
                                       builder: (context) => AlertDialog(
-                                        title: Text('Erro no Login'),
-                                        content:
-                                            Text('Credenciais Incorretas.'),
+                                        title: Text('Erro no Cadastro'),
+                                        content: Text(
+                                            'Não foi possível realizar o cadastro.'),
                                         actions: [
                                           TextButton(
                                             onPressed: () {
@@ -149,7 +132,7 @@ class _LoginApp_page extends State<LoginApp_page> {
                                 minimumSize: const Size(300, 60),
                               ),
                               child: const Text(
-                                'Login',
+                                'Cadastro',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 17,
@@ -161,7 +144,7 @@ class _LoginApp_page extends State<LoginApp_page> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 Text(
-                                  'Não tem conta? ',
+                                  'Já tem conta? ',
                                   style: TextStyle(
                                     fontSize: 17,
                                     color: Colors.black,
@@ -171,12 +154,12 @@ class _LoginApp_page extends State<LoginApp_page> {
                                   onTap: () {
                                     Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
-                                        builder: (context) => Register_page(),
+                                        builder: (context) => MyHomeApp_page(),
                                       ),
                                     );
                                   },
                                   child: Text(
-                                    'Cadastro',
+                                    'Login',
                                     style: TextStyle(
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold,

@@ -26,6 +26,27 @@ class UserCache extends ChangeNotifier {
     }
   }
 
+  Future<bool> RegisterUser(String email, String password) async {
+    try {
+      final userService = LoginServiceRest();
+      final loginData = await userService.login(email, password);
+
+      if (loginData != null) {
+        final userId = loginData.userId;
+        final userEmail = loginData.email;
+
+        _loggedInUser = User(userId: userId ?? '', email: userEmail ?? '');
+        notifyListeners();
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      print('Error during login: $error');
+      return false;
+    }
+  }
+
   User? getLoggedInUser() {
     return _loggedInUser;
   }

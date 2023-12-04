@@ -22,72 +22,87 @@ class MyHomeApp_page extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(
-              color: const Color.fromRGBO(255, 213, 213, 1.0),
-              width: 2.0,
-            ),
-            borderRadius: BorderRadius.zero,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: const EdgeInsets.only(top: 100.0),
-                child: Image.asset('assets/wwwroot/patinha.png'),
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/wwwroot/fundo.jpg'),
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                  Color.fromARGB(249, 214, 176, 245).withOpacity(0.1),
+                  BlendMode.darken,
+                ),
               ),
-              Expanded(
-                flex: 3,
-                child: Center(
-                  child: Text(
-                    'IPET',
-                    style: TextStyle(
-                      fontSize: 65,
-                      fontWeight: FontWeight.bold,
-                      color: const Color.fromRGBO(255, 213, 213, 1.0),
+            ),
+          ),
+          Center(),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(
+                color: const Color.fromRGBO(255, 213, 213, 1.0),
+                width: 2.0,
+              ),
+              borderRadius: BorderRadius.zero,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: const EdgeInsets.only(top: 100.0),
+                  child: Image.asset('assets/wwwroot/patinha.png'),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Center(
+                    child: Text(
+                      'IPET',
+                      style: TextStyle(
+                        fontSize: 65,
+                        fontWeight: FontWeight.bold,
+                        color: const Color.fromRGBO(255, 213, 213, 1.0),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => LoginApp_page(),
-                          ));
-                        },
-                        style: ElevatedButton.styleFrom(
-                          primary: const Color.fromRGBO(255, 213, 213, 1.0),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0),
+                Expanded(
+                  flex: 1,
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => LoginApp_page(),
+                            ));
+                          },
+                          style: ElevatedButton.styleFrom(
+                            primary: const Color.fromRGBO(255, 213, 213, 1.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            minimumSize: const Size(300, 60),
                           ),
-                          minimumSize: const Size(300, 60),
-                        ),
-                        child: const Text(
-                          'ACESSAR',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 17,
+                          child: const Text(
+                            'ACESSAR',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 17,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 30),
-                    ],
+                        const SizedBox(height: 30),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
