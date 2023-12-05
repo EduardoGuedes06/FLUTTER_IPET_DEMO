@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:aplication/Pages/ProdutosApp_page.dart';
 import 'package:aplication/Pages/RegisterApp_page.dart';
 import 'package:aplication/Service/UserCache.dart';
 import 'package:aplication/Service/RestService/LoginServiceRest.dart';
@@ -117,7 +118,8 @@ class _LoginApp_page extends State<LoginApp_page> {
                                   if (loginSuccessful) {
                                     Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
-                                        builder: (context) => MyHomeApp_page(),
+                                        builder: (context) =>
+                                            ProdutosApp_page(),
                                       ),
                                     );
                                   } else {
