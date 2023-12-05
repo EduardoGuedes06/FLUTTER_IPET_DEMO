@@ -1,9 +1,8 @@
-import 'dart:ui';
-import 'package:aplication/Service/UserCache.dart';
-import 'package:aplication/Service/RestService/LoginServiceRest.dart';
+import 'package:aplication/Pages/LoginApp_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'MyHomeApp_page copy.dart';
+import 'package:aplication/Service/UserRegister.dart';
 
 class Register_page extends StatefulWidget {
   @override
@@ -13,13 +12,17 @@ class Register_page extends StatefulWidget {
 class _RegisterApp_page extends State<Register_page> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  TextEditingController nomeController = TextEditingController();
+  TextEditingController docController = TextEditingController();
   TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  TextEditingController senhaController = TextEditingController();
+  TextEditingController senhaController_ = TextEditingController();
+
   AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
 
   @override
   Widget build(BuildContext context) {
-    final userCache = context.watch<UserCache>();
+    final userCache = context.watch<UserRegister>();
 
     return Scaffold(
       body: Stack(
@@ -59,29 +62,61 @@ class _RegisterApp_page extends State<Register_page> {
                         child: Column(
                           children: [
                             TextFormField(
-                              controller: emailController,
-                              decoration: InputDecoration(labelText: 'E-mail'),
+                              controller: nomeController,
+                              decoration: InputDecoration(labelText: 'Nome'),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Email';
+                                  return 'Nome é obrigatório';
                                 }
                                 return null;
                               },
                             ),
                             TextFormField(
-                              controller: passwordController,
-                              obscureText: true,
+                              controller: docController,
                               decoration:
-                                  InputDecoration(labelText: 'Password'),
+                                  InputDecoration(labelText: 'Documento'),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Senha';
+                                  return 'Documento é obrigatório';
                                 }
                                 return null;
                               },
                             ),
-                            SizedBox(height: 20),
-                            // Add additional SizedBox for increased spacing
+                            TextFormField(
+                              controller: emailController,
+                              decoration: InputDecoration(labelText: 'E-mail'),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'E-mail é obrigatório';
+                                }
+                                return null;
+                              },
+                            ),
+                            TextFormField(
+                              controller: senhaController,
+                              obscureText: true,
+                              decoration: InputDecoration(labelText: 'Senha'),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Senha é obrigatória';
+                                }
+                                return null;
+                              },
+                            ),
+                            TextFormField(
+                              controller: senhaController_,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                  labelText: 'Confirme a senha'),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Confirme a senha';
+                                } else if (value != senhaController.text) {
+                                  return 'As senhas não coincidem';
+                                }
+                                return null;
+                              },
+                            ),
                             SizedBox(height: 20),
                             ElevatedButton(
                               onPressed: () async {
@@ -90,17 +125,19 @@ class _RegisterApp_page extends State<Register_page> {
                                 });
 
                                 if (_formKey.currentState!.validate()) {
-                                  // Use the registration function instead of login
                                   final registrationSuccessful =
                                       await userCache.RegisterUser(
+                                    nomeController.text,
+                                    docController.text,
                                     emailController.text,
-                                    passwordController.text,
+                                    senhaController.text,
+                                    senhaController_.text,
                                   );
 
                                   if (registrationSuccessful) {
                                     Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
-                                        builder: (context) => MyHomeApp_page(),
+                                        builder: (context) => LoginApp_page(),
                                       ),
                                     );
                                   } else {
