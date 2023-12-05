@@ -1,3 +1,4 @@
+import 'package:aplication/Pages/CartApp_page.dart';
 import 'package:aplication/Service/UserCache.dart';
 import 'package:flutter/material.dart';
 import 'package:aplication/Models/Product.dart';
@@ -31,7 +32,7 @@ class _ProdutosApp_pageState extends State<ProdutosApp_page> {
         title: Text(
           'Produtos',
           style: TextStyle(
-            fontSize: 60,
+            fontSize: 45,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -70,44 +71,42 @@ class _ProdutosApp_pageState extends State<ProdutosApp_page> {
           ],
         ),
         child: BottomNavigationBar(
-          elevation: 0.0,
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          iconSize: 38.0,
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.crop_square_outlined,
-                color: Color.fromRGBO(222, 218, 245, 1.0),
+            elevation: 0.0,
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            iconSize: 38.0,
+            items: <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.store,
+                  color: Colors.red,
+                ),
+                label: '',
               ),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.search,
-                color: Color.fromRGBO(222, 218, 245, 1.0),
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.shopping_cart,
+                  color: Color.fromRGBO(255, 200, 200, 1.0),
+                ),
+                label: '',
               ),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.chat_bubble_outline_outlined,
-                color: Color.fromRGBO(222, 218, 245, 1.0),
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.person,
+                  color: Color.fromRGBO(255, 200, 200, 1.0),
+                ),
+                label: '',
               ),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.person,
-                color: Color.fromRGBO(150, 131, 220, 1.0),
-              ),
-              label: '',
-            ),
-          ],
-          onTap: (int index) {
-            // Adicione a lógica para lidar com os ícones do BottomNavigationBar
-          },
-        ),
+            ],
+            onTap: (int index) {
+              if (index == 1) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => CartApp_page(),
+                  ),
+                );
+              }
+            }),
       ),
     );
   }
