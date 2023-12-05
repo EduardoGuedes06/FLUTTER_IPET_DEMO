@@ -24,3 +24,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/wwwroot/patinha.png
+    - assets/wwwroot/Produtos/racao.jpg

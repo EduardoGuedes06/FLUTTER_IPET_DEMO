@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "wlS5iNi0UVirnUmTAtKuOqN3strdqB9z9sQkcb/eRdTNaN13au7y+7gP2psuKyJfW3NCyXeMGWBmyJFW3buJFg==",
+  "success": true,
+  "projectFilePath": "D:\\AMBIENTE DEV\\DART\\MOBILE\\FLUTTER_DEMO_IPET\\FLUTTER_IPET_DEMO\\ApiIpet_Mobile\\API\\src\\Ipet.Domain\\Ipet.Domain.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Eduardo\\.nuget\\packages\\fluentvalidation\\11.4.0\\fluentvalidation.11.4.0.nupkg.sha512"
+  ],
+  "logs": []
+}

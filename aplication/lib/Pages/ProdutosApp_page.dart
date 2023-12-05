@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:aplication/Models/Product.dart';
+import 'package:aplication/Service/ProductsCache.dart';
 
 class ProdutosApp_page extends StatefulWidget {
   @override
@@ -8,15 +10,17 @@ class ProdutosApp_page extends StatefulWidget {
 class _ProdutosApp_pageState extends State<ProdutosApp_page> {
   @override
   Widget build(BuildContext context) {
+    final List<Product> products = ProductsCache.getProducts();
+
     return Scaffold(
       backgroundColor: Colors.red, // Fundo vermelho
       appBar: AppBar(
-        backgroundColor: Colors.transparent, // Barra de navegação transparente
-        elevation: 0, // Sem sombra na barra de navegação
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: Colors.white, // Cor branca
+            color: Colors.white,
           ),
           onPressed: () {
             // Adicione a navegação para a página anterior aqui
@@ -27,15 +31,47 @@ class _ProdutosApp_pageState extends State<ProdutosApp_page> {
           style: TextStyle(
             fontSize: 60,
             fontWeight: FontWeight.bold,
-            color: Colors.white, // Cor branca
+            color: Colors.white,
           ),
         ),
-        centerTitle: true, // Centralizar o título
+        centerTitle: true,
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[],
+          children: <Widget>[
+            Text(
+              'Lista de Produtos',
+              style: TextStyle(
+                fontSize: 24,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(height: 20),
+            Expanded(
+              child: ListView.builder(
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  final Product product = products[index];
+                  return ListTile(
+                    title: Text(
+                      product.nome,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    subtitle: Text(
+                      'R\$ ${product.valor.toStringAsFixed(2)}',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    leading: Image.asset(
+                      'assets/wwwroot/Produtos/${product.image}',
+                      width: 40,
+                      height: 40,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: Container(
