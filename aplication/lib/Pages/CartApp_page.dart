@@ -1,10 +1,10 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:aplication/Models/Cart.dart';
 import 'package:aplication/Pages/ProdutosApp_page.dart';
 import 'package:aplication/Service/CartCache.dart';
 import 'package:aplication/Service/RestService/CartServiceRest.dart';
 import 'package:aplication/Service/UserCache.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class CartApp_page extends StatefulWidget {
   @override
@@ -13,6 +13,7 @@ class CartApp_page extends StatefulWidget {
 
 class _CartApp_pageState extends State<CartApp_page> {
   late Future<List<Cart>> cartItemsFuture;
+  double total = 0.0;
 
   @override
   void initState() {
@@ -25,7 +26,20 @@ class _CartApp_pageState extends State<CartApp_page> {
     final loggedInUser = userCache.getLoggedInUser();
     final userId = loggedInUser?.userId;
 
-    return await CartServiceRest().getCart(userId ?? '');
+    List<Cart> cartItems = await CartServiceRest().getCart(userId ?? '');
+    setState(() {
+      total = _calculateTotal(cartItems);
+    });
+
+    return cartItems;
+  }
+
+  double _calculateTotal(List<Cart> cartItems) {
+    double sum = 0.0;
+    for (var item in cartItems) {
+      sum += (item.valor * item.qtd);
+    }
+    return sum;
   }
 
   @override
@@ -52,120 +66,146 @@ class _CartApp_pageState extends State<CartApp_page> {
         ),
         centerTitle: true,
       ),
-      // ... (seu código anterior)
-// ... (seu código anterior)
+      body: Column(
+        children: [
+          // Lista de itens do carrinho
+          Expanded(
+            child: FutureBuilder<List<Cart>>(
+              future: cartItemsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Erro: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('Nenhum item no carrinho.'));
+                } else {
+                  List<Cart> cartItems = snapshot.data!;
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: cartItems.map((cartItem) {
+                        return Center(
+                          child: Container(
+                            width:
+                                300.0, // Largura ajustável conforme necessário
+                            margin: EdgeInsets.all(8.0),
+                            padding: EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12.0),
+                              border: Border.all(
+                                color: Colors.grey,
+                                width: 1.0,
+                              ),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  cartItem.nome,
+                                  style: TextStyle(
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.center,
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  'R\$ ${cartItem.valor.toStringAsFixed(2)}',
+                                  style: TextStyle(fontSize: 16.0),
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  'Quantidade: ${cartItem.qtd}',
+                                  style: TextStyle(fontSize: 16.0),
+                                ),
+                                SizedBox(height: 16.0),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        bool success = await CartServiceRest()
+                                            .UpdateItemCart(cartItem.id,
+                                                (cartItem.qtd + 1));
+                                        if (success) {
+                                          setState(() {
+                                            cartItem.qtd += 1;
+                                            total = _calculateTotal(cartItems);
+                                          });
+                                        }
+                                      },
+                                      child: Icon(Icons.add),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        if (cartItem.qtd == 1) {
+                                          return;
+                                        }
 
-      body: FutureBuilder<List<Cart>>(
-        future: cartItemsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Erro: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('Nenhum item no carrinho.'));
-          } else {
-            List<Cart> cartItems = snapshot.data!;
-            return SingleChildScrollView(
-              child: Column(
-                children: cartItems.map((cartItem) {
-                  return Center(
-                    child: Container(
-                      width: 300.0, // Largura ajustável conforme necessário
-                      margin: EdgeInsets.all(8.0),
-                      padding: EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12.0),
-                        border: Border.all(
-                          color: Colors.grey,
-                          width: 1.0,
-                        ),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            cartItem.nome,
-                            style: TextStyle(
-                                fontSize: 18.0, fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
+                                        bool success = await CartServiceRest()
+                                            .UpdateItemCart(cartItem.id,
+                                                (cartItem.qtd - 1));
+                                        if (success) {
+                                          setState(() {
+                                            cartItem.qtd -= 1;
+                                            total = _calculateTotal(cartItems);
+                                          });
+                                        }
+                                      },
+                                      child: Icon(Icons.remove),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        bool success = await CartServiceRest()
+                                            .DeleteItemCart(cartItem.id);
+                                        if (success) {
+                                          setState(() {
+                                            cartItems.remove(cartItem);
+                                            total = _calculateTotal(cartItems);
+                                          });
+                                        }
+                                      },
+                                      child: Icon(Icons.delete),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                          SizedBox(height: 8.0),
-                          Text(
-                            'R\$ ${cartItem.valor.toStringAsFixed(2)}',
-                            style: TextStyle(fontSize: 16.0),
-                          ),
-                          SizedBox(height: 8.0),
-                          Text(
-                            'Quantidade: ${cartItem.qtd}',
-                            style: TextStyle(fontSize: 16.0),
-                          ),
-                          SizedBox(height: 16.0),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              ElevatedButton(
-                                onPressed: () async {
-                                  bool success = await CartServiceRest()
-                                      .UpdateItemCart(
-                                          cartItem.id, (cartItem.qtd + 1));
-                                  if (success) {
-                                    setState(() {
-                                      cartItem.qtd += 1;
-                                    });
-                                  }
-                                },
-                                child: Icon(Icons.add),
-                              ),
-                              ElevatedButton(
-                                onPressed: () async {
-                                  if (cartItem.qtd == 1) {
-                                    return;
-                                  }
-
-                                  bool success = await CartServiceRest()
-                                      .UpdateItemCart(
-                                          cartItem.id, (cartItem.qtd - 1));
-                                  if (success) {
-                                    setState(() {
-                                      cartItem.qtd - 1;
-                                    });
-                                  }
-                                },
-                                child: Icon(Icons.remove),
-                              ),
-                              ElevatedButton(
-                                onPressed: () async {
-                                  // Lógica para deletar o item
-                                  bool success = await CartServiceRest()
-                                      .DeleteItemCart(cartItem.id);
-                                  if (success) {
-                                    // Atualizar a lista após deletar o item
-                                    setState(() {
-                                      cartItems.remove(cartItem);
-                                    });
-                                  }
-                                },
-                                child: Icon(Icons.delete),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                        );
+                      }).toList(),
                     ),
                   );
-                }).toList(),
+                }
+              },
+            ),
+          ),
+
+          // Campo Total
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Total: R\$ ${total.toStringAsFixed(2)}',
+              style: TextStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
               ),
-            );
-          }
-        },
+            ),
+          ),
+
+          // Botão Pagamento
+          ElevatedButton(
+            onPressed: () {
+              // Lógica para processar o pagamento
+              // Implemente a lógica desejada aqui
+              // Pode abrir uma nova tela para o pagamento, chamar um serviço, etc.
+            },
+            child: Text('Pagamento'),
+          ),
+        ],
       ),
-
-// ... (seu código posterior)
-
-// ... (seu código posterior)
       bottomNavigationBar: Container(
         height: 100.0,
         decoration: BoxDecoration(
