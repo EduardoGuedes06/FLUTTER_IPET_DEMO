@@ -182,8 +182,8 @@ namespace Ipet.API.Controllers
             return Ok();
         }
 
-        [HttpPut("atualizar-quantidade/{CarrinhoId}")]
-        public async Task<IActionResult> AtualizarQuantidadeProduto(Guid CarrinhoId, [FromBody] int novaQuantidade)
+        [HttpPut("atualizar-quantidade/{CarrinhoId}/{novaQuantidade}")]
+        public async Task<IActionResult> AtualizarQuantidadeProduto(Guid CarrinhoId, int novaQuantidade)
         {
             await _carrinhoService.AtualizarQuantidadeProduto(CarrinhoId, novaQuantidade);
             return Ok();

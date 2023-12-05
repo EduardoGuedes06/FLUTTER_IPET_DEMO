@@ -68,4 +68,52 @@ class CartServiceRest {
 
     return [];
   }
+
+  //DELETE
+  Future<bool> DeleteItemCart(String id) async {
+    final String apiUrl = 'https://localhost:7094/remover-produto/' + id;
+
+    try {
+      final response = await http.delete(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+      }
+    } catch (error) {
+      print('Error during cart request: $error');
+    }
+
+    return true;
+  }
+
+  //UPDATE
+
+  Future<bool> UpdateItemCart(String id, int qtde) async {
+    final String apiUrl = 'https://localhost:7094/atualizar-quantidade/' +
+        id +
+        '/' +
+        qtde.toString();
+
+    try {
+      final response = await http.put(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+      }
+    } catch (error) {
+      print('Error during cart request: $error');
+    }
+
+    return true;
+  }
 }

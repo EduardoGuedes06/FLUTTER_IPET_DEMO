@@ -3,7 +3,7 @@ class Cart {
   final String nome;
   final double valor;
   final String data;
-  final int qtd;
+  int qtd;
   Cart(
       {required this.id,
       required this.nome,

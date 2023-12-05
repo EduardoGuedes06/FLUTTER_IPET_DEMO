@@ -107,19 +107,47 @@ class _CartApp_pageState extends State<CartApp_page> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               ElevatedButton(
-                                onPressed: () {
-                                  // Lógica para aumentar a quantidade
+                                onPressed: () async {
+                                  bool success = await CartServiceRest()
+                                      .UpdateItemCart(
+                                          cartItem.id, (cartItem.qtd + 1));
+                                  if (success) {
+                                    setState(() {
+                                      cartItem.qtd += 1;
+                                    });
+                                  }
                                 },
                                 child: Icon(Icons.add),
                               ),
                               ElevatedButton(
-                                onPressed: () {
-                                  // Lógica para diminuir a quantidade
+                                onPressed: () async {
+                                  if (cartItem.qtd == 1) {
+                                    return;
+                                  }
+
+                                  bool success = await CartServiceRest()
+                                      .UpdateItemCart(
+                                          cartItem.id, (cartItem.qtd - 1));
+                                  if (success) {
+                                    setState(() {
+                                      cartItem.qtd - 1;
+                                    });
+                                  }
                                 },
                                 child: Icon(Icons.remove),
                               ),
                               ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () async {
+                                  // Lógica para deletar o item
+                                  bool success = await CartServiceRest()
+                                      .DeleteItemCart(cartItem.id);
+                                  if (success) {
+                                    // Atualizar a lista após deletar o item
+                                    setState(() {
+                                      cartItems.remove(cartItem);
+                                    });
+                                  }
+                                },
                                 child: Icon(Icons.delete),
                               ),
                             ],
