@@ -1,6 +1,5 @@
 import 'package:aplication/Models/Product.dart';
 import 'package:flutter/material.dart';
-import 'package:aplication/Models/User.dart';
 
 class ProductsCache extends ChangeNotifier {
   static final List<Product> _products = [

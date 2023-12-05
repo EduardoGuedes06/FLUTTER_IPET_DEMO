@@ -36,42 +36,23 @@ class _ProdutosApp_pageState extends State<ProdutosApp_page> {
         ),
         centerTitle: true,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Lista de Produtos',
-              style: TextStyle(
-                fontSize: 24,
-                color: Colors.white,
-              ),
+      body: SingleChildScrollView(
+        child: Center(
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            padding: EdgeInsets.all(16.0),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16.0,
+              mainAxisSpacing: 16.0,
             ),
-            SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: products.length,
-                itemBuilder: (context, index) {
-                  final Product product = products[index];
-                  return ListTile(
-                    title: Text(
-                      product.nome,
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    subtitle: Text(
-                      'R\$ ${product.valor.toStringAsFixed(2)}',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    leading: Image.asset(
-                      'assets/wwwroot/Produtos/${product.image}',
-                      width: 40,
-                      height: 40,
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
+            itemCount: products.length,
+            itemBuilder: (context, index) {
+              final Product product = products[index];
+              return ProductTile(product: product);
+            },
+          ),
         ),
       ),
       bottomNavigationBar: Container(
@@ -125,6 +106,46 @@ class _ProdutosApp_pageState extends State<ProdutosApp_page> {
             // Adicione a lógica para lidar com os ícones do BottomNavigationBar
           },
         ),
+      ),
+    );
+  }
+}
+
+class ProductTile extends StatelessWidget {
+  final Product product;
+
+  const ProductTile({required this.product});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.0),
+        border: Border.all(
+          color: Colors.grey,
+          width: 1.0,
+        ),
+      ),
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Image.asset(
+            'assets/wwwroot/Produtos/${product.image}',
+            width: 120,
+            height: 120,
+          ),
+          Text(
+            product.nome,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16.0),
+          ),
+          Text(
+            'R\$ ${product.valor.toStringAsFixed(2)}',
+            style: TextStyle(fontSize: 16.0),
+          ),
+        ],
       ),
     );
   }
