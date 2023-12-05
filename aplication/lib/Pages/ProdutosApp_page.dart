@@ -1,6 +1,8 @@
+import 'package:aplication/Service/UserCache.dart';
 import 'package:flutter/material.dart';
 import 'package:aplication/Models/Product.dart';
 import 'package:aplication/Service/ProductsCache.dart';
+import 'package:provider/provider.dart';
 
 class ProdutosApp_page extends StatefulWidget {
   @override
@@ -118,6 +120,9 @@ class ProductTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userCache = Provider.of<UserCache>(context, listen: false);
+    final carrinhoCache = Provider.of<ProductsCache>(context);
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -144,6 +149,46 @@ class ProductTile extends StatelessWidget {
           Text(
             'R\$ ${product.valor.toStringAsFixed(2)}',
             style: TextStyle(fontSize: 16.0),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              // Obtém o ID do usuário conectado
+              final loggedInUser = userCache.getLoggedInUser();
+              final userId = loggedInUser?.userId;
+
+              // Adiciona o item ao carrinho com o ID do usuário
+              if (userId != null) {
+                carrinhoCache.addToCart(userId, product);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Produto adicionado ao carrinho!'),
+                  ),
+                );
+              } else {
+                // Trate o caso em que o usuário não está conectado
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                        'Você precisa estar conectado para adicionar produtos ao carrinho.'),
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              primary: Colors.blue,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              minimumSize: Size(40, 20),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.shopping_cart),
+                SizedBox(width: 3.0),
+                Text('Adicionar'),
+              ],
+            ),
           ),
         ],
       ),

@@ -1,5 +1,8 @@
 import 'package:aplication/Models/Product.dart';
+import 'package:aplication/Service/RestService/AddCartServiceRest.dart';
+import 'package:aplication/Service/UserCache.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 class ProductsCache extends ChangeNotifier {
   static final List<Product> _products = [
@@ -52,6 +55,16 @@ class ProductsCache extends ChangeNotifier {
       image: 'racao.jpg',
     ),
   ];
+
+  Future<void> addToCart(String user, Product product) async {
+    try {
+      final cartService = CartServiceRest();
+      final loginData = await cartService.addToCart(user, product);
+      notifyListeners();
+    } catch (error) {
+      print('Error adding to cart: $error');
+    }
+  }
 
   static List<Product> getProducts() {
     return _products;
