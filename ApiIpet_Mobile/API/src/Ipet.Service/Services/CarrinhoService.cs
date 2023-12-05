@@ -39,8 +39,22 @@ namespace Ipet.Service.Services
 
         public async Task CriarCarrinho(Carrinho carrinho)
         {
-            await _carrinhoRepository.Adicionar(carrinho);
+            var usuarioId = carrinho.UsuarioId;
+            var nomeProduto = carrinho.NomeProduto;
+            var carrinhoExistente = await _carrinhoRepository.ObterPorUsuarioId(usuarioId);
+            var produtoExistente = carrinhoExistente.FirstOrDefault(p => p.NomeProduto == nomeProduto);
+
+            if (produtoExistente != null)
+            {
+                await AtualizarQuantidadeProduto(produtoExistente.Id, carrinho.Qtde + produtoExistente.Qtde);
+            }
+            else
+            {
+                // Se o produto não existe, adiciona ao carrinho
+                await _carrinhoRepository.Adicionar(carrinho);
+            }
         }
+
 
         public async Task AtualizarQuantidadeProduto(Guid CarrinhoId, int novaQuantidade)
         {

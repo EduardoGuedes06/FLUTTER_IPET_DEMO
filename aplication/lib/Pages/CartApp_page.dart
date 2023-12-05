@@ -1,6 +1,7 @@
 import 'package:aplication/Models/Cart.dart';
 import 'package:aplication/Pages/ProdutosApp_page.dart';
 import 'package:aplication/Service/CartCache.dart';
+import 'package:aplication/Service/RestService/CartServiceRest.dart';
 import 'package:aplication/Service/UserCache.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,25 +12,20 @@ class CartApp_page extends StatefulWidget {
 }
 
 class _CartApp_pageState extends State<CartApp_page> {
-  late List<Cart> cartItems;
+  late Future<List<Cart>> cartItemsFuture;
 
   @override
   void initState() {
     super.initState();
-    _loadCart();
+    cartItemsFuture = _loadCart();
   }
 
-  Future<void> _loadCart() async {
+  Future<List<Cart>> _loadCart() async {
     final userCache = Provider.of<UserCache>(context, listen: false);
     final loggedInUser = userCache.getLoggedInUser();
     final userId = loggedInUser?.userId;
 
-    final updatedCart = await Provider.of<CartCache>(context, listen: false)
-        .getCart(userId ?? '');
-
-    setState(() {
-      cartItems = updatedCart;
-    });
+    return await CartServiceRest().getCart(userId ?? '');
   }
 
   @override
@@ -56,29 +52,92 @@ class _CartApp_pageState extends State<CartApp_page> {
         ),
         centerTitle: true,
       ),
-      body: cartItems == null
-          ? Center(child: CircularProgressIndicator())
-          : cartItems.isEmpty
-              ? Center(child: Text('Nenhum item no carrinho.'))
-              : SingleChildScrollView(
-                  child: Center(
-                    child: GridView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
+      // ... (seu código anterior)
+// ... (seu código anterior)
+
+      body: FutureBuilder<List<Cart>>(
+        future: cartItemsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Erro: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('Nenhum item no carrinho.'));
+          } else {
+            List<Cart> cartItems = snapshot.data!;
+            return SingleChildScrollView(
+              child: Column(
+                children: cartItems.map((cartItem) {
+                  return Center(
+                    child: Container(
+                      width: 300.0, // Largura ajustável conforme necessário
+                      margin: EdgeInsets.all(8.0),
                       padding: EdgeInsets.all(16.0),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 16.0,
-                        mainAxisSpacing: 16.0,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12.0),
+                        border: Border.all(
+                          color: Colors.grey,
+                          width: 1.0,
+                        ),
                       ),
-                      itemCount: cartItems.length,
-                      itemBuilder: (context, index) {
-                        final Cart cartItem = cartItems[index];
-                        return CartItemTile(cartItem: cartItem);
-                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            cartItem.nome,
+                            style: TextStyle(
+                                fontSize: 18.0, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: 8.0),
+                          Text(
+                            'R\$ ${cartItem.valor.toStringAsFixed(2)}',
+                            style: TextStyle(fontSize: 16.0),
+                          ),
+                          SizedBox(height: 8.0),
+                          Text(
+                            'Quantidade: ${cartItem.qtd}',
+                            style: TextStyle(fontSize: 16.0),
+                          ),
+                          SizedBox(height: 16.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Lógica para aumentar a quantidade
+                                },
+                                child: Icon(Icons.add),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Lógica para diminuir a quantidade
+                                },
+                                child: Icon(Icons.remove),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {},
+                                child: Icon(Icons.delete),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                }).toList(),
+              ),
+            );
+          }
+        },
+      ),
+
+// ... (seu código posterior)
+
+// ... (seu código posterior)
       bottomNavigationBar: Container(
         height: 100.0,
         decoration: BoxDecoration(
@@ -142,6 +201,8 @@ class CartItemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: EdgeInsets.all(8.0),
+      padding: EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.0),
@@ -150,17 +211,24 @@ class CartItemTile extends StatelessWidget {
           width: 1.0,
         ),
       ),
-      padding: EdgeInsets.all(16.0),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             cartItem.nome,
-            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 8.0),
+          Text(
+            'Quantidade: ${cartItem.qtd}',
             style: TextStyle(fontSize: 16.0),
           ),
           Text(
-            'R\$ ${cartItem.valor.toStringAsFixed(2)}',
+            'Valor: R\$ ${cartItem.valor.toStringAsFixed(2)}',
+            style: TextStyle(fontSize: 16.0),
+          ),
+          Text(
+            'Data: ${cartItem.data}',
             style: TextStyle(fontSize: 16.0),
           ),
         ],
