@@ -13,6 +13,7 @@ namespace Ipet.Data.Context
         }
 
         public DbSet<Carrinho> Carrinhos { get; set; }
+        public DbSet<Compra> Compras { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

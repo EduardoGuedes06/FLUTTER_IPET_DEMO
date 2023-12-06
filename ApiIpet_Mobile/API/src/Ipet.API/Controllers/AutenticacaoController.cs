@@ -1,6 +1,11 @@
-﻿using Ipet.API.Extensions;
+﻿using AutoMapper;
+using Ipet.Api.ViewModels;
+using Ipet.API.Extensions;
+using Ipet.API.Models;
 using Ipet.API.ViewModels;
 using Ipet.Domain.Intefaces;
+using Ipet.Domain.Models;
+using Ipet.Interfaces.Services;
 using LastCode.Identity.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -17,83 +22,101 @@ namespace Ipet.API.Controllers
 {
     //[Authorize]
     [ApiVersion("1.0")]
-    [Route("ipet/v{version:apiVersion}")]
+    [Route("autenticate")]
     public class AutenticacaoController : HomeController
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly ICarrinhoService _carrinhoService;
+        private readonly IMapper _mapper;
 
         private readonly AppSettings _appSettings;
         private readonly ILogger _logger;
-        public AutenticacaoController(INotificador notificador,
+        public AutenticacaoController(ICarrinhoService carrinhoService,
+            IMapper mapper,INotificador notificador,
                               SignInManager<IdentityUser> signInManager,
                               UserManager<IdentityUser> userManager,
                               IOptions<AppSettings> appSettings,
                               IUser user, ILogger<AutenticacaoController> logger) : base(notificador, user)
         {
+            _carrinhoService = carrinhoService;
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
             _appSettings = appSettings.Value;
+            _mapper = mapper;
         }
 
 
         //[ClaimsAuthorize("Admin", "1")]
-        //[AllowAnonymous]
-        //[HttpPost("nova-conta")]
-        //public async Task<ActionResult> Registrar(RegisterUserViewModel registerUser)
-        //{
-        //    if (!ModelState.IsValid) return CustomResponse(ModelState);
+        [AllowAnonymous]
+        [HttpPost("nova-conta-mobile")]
+        public async Task<ActionResult> Registrar(RegisterUserViewModel Input)
+        {
+            if (!ModelState.IsValid) return CustomResponse(ModelState);
 
-        //    var user = new IdentityUser
-        //    {
-        //        UserName = registerUser.Email,
-        //        Email = registerUser.Email,
-        //        EmailConfirmed = true
-        //    };
+            var user = new ApplicationUser()
+            {
+                UserName = Input.Email,
+                Nome = Input.Nome,
+                Email = Input.Email,
+                Documento = Input.Doc,
+                Cep = Input.Cep,
+                Numero = Input.Numero,
+                Password = Input.Password,
+                ConfirmPassord = Input.ConfirmPassword,
+                Imagem = ""
 
-        //    var result = await _userManager.CreateAsync(user, registerUser.Password);
-        //    if (result.Succeeded)
-        //    {
-        //        await _signInManager.SignInAsync(user, false);
+            };
 
-        //        //var cityClaim = new Claim("User", "2");
+            var result = await _userManager.CreateAsync(user, Input.Password);
+            if (result.Succeeded)
+            {
+                await _signInManager.SignInAsync(user, false);
 
-        //        //await _userManager.AddClaimAsync(user, cityClaim);
-        //        return CustomResponse(await GerarJwt(user.Email));
-        //    }
-        //    foreach (var error in result.Errors)
-        //    {
-        //        NotificarErro(error.Description);
-        //    }
+                var claim = new Claim("Usuario", "1");
+                await _userManager.AddClaimAsync(user, claim);
 
-        //    return CustomResponse(registerUser);
-        //}
+                return CustomResponse(await GerarJwt(user.Email));
+            }
+            foreach (var error in result.Errors)
+            {
+                NotificarErro(error.Description);
+            }
 
-        //[AllowAnonymous]
-        //[HttpPost("entrar")]
-        //public async Task<ActionResult> Login(LoginUserViewModel loginUser)
-        //{
-        //    if (!ModelState.IsValid) return CustomResponse(ModelState);
+            return CustomResponse(Input);
+        }
 
-        //    var result = await _signInManager.PasswordSignInAsync(loginUser.Email, loginUser.Password, false, true);
+        [AllowAnonymous]
+        [HttpPost("entrar-mobile")]
+        public async Task<ActionResult> Login(LoginUserViewModel loginUser)
+        {
+            if (!ModelState.IsValid) return CustomResponse(ModelState);
 
-        //    if (result.Succeeded)
-        //    {
-        //        _logger.LogInformation("Usuario " + loginUser.Email + " logado com sucesso");
-        //        return CustomResponse(await GerarJwt(loginUser.Email));
-        //    }
-        //    if (result.IsLockedOut)
-        //    {
-        //        NotificarErro("Usuário temporariamente bloqueado por tentativas inválidas");
-        //        return CustomResponse(loginUser);
-        //    }
+            var result = await _signInManager.PasswordSignInAsync(loginUser.Email, loginUser.Password, false, true);
 
-        //    NotificarErro("Usuário ou Senha incorretos");
-        //    return CustomResponse(loginUser);
-        //}
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("Usuario " + loginUser.Email + " logado com sucesso");
+                return CustomResponse(await GerarJwt(loginUser.Email));
+            }
+            if (result.IsLockedOut)
+            {
+                NotificarErro("Usuário temporariamente bloqueado por tentativas inválidas");
+                return CustomResponse(loginUser);
+            }
 
+            NotificarErro("Usuário ou Senha incorretos");
+            return CustomResponse(loginUser);
+        }
 
+        [Authorize]
+        [HttpPost("test-token")]
+        public async Task<ActionResult<bool>> Test()
+        {
+
+            return true;
+        }
         private async Task<LoginResponseViewModel> GerarJwt(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
@@ -141,6 +164,7 @@ namespace Ipet.API.Controllers
             return response;
         }
         private static long ToUnixEpochDate(DateTime date) => (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero)).TotalSeconds);
+
     }
 }
 

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ipet.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231204133648_Teste_0")]
-    partial class Teste_0
+    [Migration("20231206105047_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

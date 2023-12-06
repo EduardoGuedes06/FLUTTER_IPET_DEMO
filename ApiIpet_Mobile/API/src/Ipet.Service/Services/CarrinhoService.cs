@@ -15,22 +15,6 @@ namespace Ipet.Service.Services
             _carrinhoRepository = carrinhoRepository;
         }
 
-        public async Task FinalizarCompra(Guid usuarioId)
-        {
-            var carrinhoItens = await _carrinhoRepository.ObterPorUsuarioId(usuarioId);
-
-            if (!carrinhoItens.Any())
-            {
-                Notificar("Carrinho não encontrado ou vazio.");
-                return;
-            }
-
-            foreach (var carrinhoItem in carrinhoItens)
-            {
-                await _carrinhoRepository.Remover(carrinhoItem.Id);
-            }
-        }
-
         public async Task<IEnumerable<Carrinho>> ObterCarrinhoPorUsuario(Guid usuarioId)
         {
             var carrinho = await _carrinhoRepository.ObterPorUsuarioId(usuarioId);

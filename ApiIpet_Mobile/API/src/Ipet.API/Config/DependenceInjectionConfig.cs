@@ -24,6 +24,8 @@ namespace Ipet.API.Configuration
             services.AddScoped<ICarrinhoService, CarrinhoService>();
             services.AddScoped<ICarrinhoRepository, CarrinhoRepository>();
 
+            services.AddScoped<ICompraService, CompraService>();
+            services.AddScoped<ICompraRepository, CompraRepository>();
 
 
             return services;

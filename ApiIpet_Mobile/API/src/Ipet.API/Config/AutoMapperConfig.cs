@@ -9,6 +9,7 @@ namespace Ipet.API.Configuration
         public AutoMapperConfig()
         {
             CreateMap<Carrinho, CarrinhoViewModel>().ReverseMap();
+            CreateMap<Compra, CompraViewModel>().ReverseMap();
 
 
         }

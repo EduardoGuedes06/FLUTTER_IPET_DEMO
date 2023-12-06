@@ -45,6 +45,29 @@ namespace Ipet.Data.Migrations
 
                     b.ToTable("Carrinho", (string)null);
                 });
+
+            modelBuilder.Entity("Ipet.Domain.Models.Compra", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("DataCadastro")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<float>("Valor")
+                        .HasColumnType("float");
+
+                    b.Property<int>("qtde")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Compra", (string)null);
+                });
 #pragma warning restore 612, 618
         }
     }
