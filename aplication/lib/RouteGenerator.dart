@@ -3,6 +3,7 @@ import 'package:aplication/Pages/MyHomeApp_page%20copy.dart';
 import 'package:aplication/Pages/LoginApp_page.dart';
 import 'package:aplication/Pages/ProdutosApp_page.dart';
 import 'package:aplication/Pages/RegisterApp_page.dart';
+import 'package:aplication/Pages/UserApp_page.dart';
 import 'package:flutter/material.dart';
 
 class RouteGenerator {
@@ -18,6 +19,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => ProdutosApp_page());
       case '/Carrinho':
         return MaterialPageRoute(builder: (_) => CartApp_page());
+      case '/User':
+        return MaterialPageRoute(builder: (_) => UserApp_page());
       default:
         return MaterialPageRoute(builder: (_) => const MyHomeApp_page());
     }

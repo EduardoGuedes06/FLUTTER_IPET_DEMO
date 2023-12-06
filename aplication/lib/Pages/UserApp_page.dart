@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:aplication/Models/Cart.dart';
+import 'package:aplication/Pages/CartApp_page.dart';
 import 'package:aplication/Pages/ProdutosApp_page.dart';
 import 'package:aplication/Service/CartCache.dart';
 import 'package:aplication/Service/RestService/CartServiceRest.dart';
+import 'package:aplication/Service/RestService/PaymentServiceRest.dart';
 import 'package:aplication/Service/UserCache.dart';
+import 'package:geolocator_web/geolocator_web.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 class UserApp_page extends StatefulWidget {
   @override
@@ -15,10 +20,64 @@ class _UserApp_pageState extends State<UserApp_page> {
   late Future<List<Cart>> cartItemsFuture;
   double total = 0.0;
 
+  // Variáveis para armazenar informações do usuário
+  String userEmail = '';
+  String userLocation = '';
+
   @override
   void initState() {
     super.initState();
     cartItemsFuture = _loadCart();
+    _loadUserInfo();
+  }
+
+  void _limparCarrinho() {
+    setState(() {
+      total = 0.0;
+      cartItemsFuture = _loadCart();
+    });
+  }
+
+  Future<void> _confirmarCompra() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmar Compra'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Deseja confirmar a compra?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Não'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Sim'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _finalizarCompra();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _finalizarCompra() async {
+    final userCache = Provider.of<UserCache>(context, listen: false);
+    final loggedInUser = userCache.getLoggedInUser();
+    final userId = loggedInUser?.userId;
+    bool success = await PaymentServiceRest().finalizePayment(userId ?? '');
+
+    _limparCarrinho();
   }
 
   Future<List<Cart>> _loadCart() async {
@@ -34,6 +93,17 @@ class _UserApp_pageState extends State<UserApp_page> {
     return cartItems;
   }
 
+  Future<void> _loadUserInfo() async {
+    final userCache = Provider.of<UserCache>(context, listen: false);
+    final loggedInUser = userCache.getLoggedInUser();
+
+    setState(() {
+      userEmail = loggedInUser?.email ?? '';
+    });
+
+    await _obterLocalizacao();
+  }
+
   double _calculateTotal(List<Cart> cartItems) {
     double sum = 0.0;
     for (var item in cartItems) {
@@ -42,8 +112,64 @@ class _UserApp_pageState extends State<UserApp_page> {
     return sum;
   }
 
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    return await Geolocator.getCurrentPosition();
+  }
+
+  Future<void> _obterLocalizacao() async {
+    try {
+      Position position = await _determinePosition();
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+      if (placemarks.isNotEmpty) {
+        Placemark placemark = placemarks.first;
+
+        // Exibir o endereço ou CEP
+        setState(() {
+          placemark.postalCode ?? 'Endereço desconhecido';
+        });
+      }
+      setState(() {
+        userLocation =
+            'Latitude: ${position.latitude}, Longitude: ${position.longitude}';
+      });
+    } catch (e) {
+      print('Erro ao obter a localização: $e');
+      setState(() {
+        userLocation = 'Erro ao obter a localização';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final userCache = Provider.of<UserCache>(context, listen: false);
     return Scaffold(
       backgroundColor: Colors.red, // Fundo vermelho
       appBar: AppBar(
@@ -57,7 +183,7 @@ class _UserApp_pageState extends State<UserApp_page> {
           onPressed: () {},
         ),
         title: Text(
-          'Carrinho',
+          'Perfil',
           style: TextStyle(
             fontSize: 45,
             fontWeight: FontWeight.bold,
@@ -67,143 +193,64 @@ class _UserApp_pageState extends State<UserApp_page> {
         centerTitle: true,
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Lista de itens do carrinho
-          Expanded(
-            child: FutureBuilder<List<Cart>>(
-              future: cartItemsFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Erro: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('Nenhum item no carrinho.'));
-                } else {
-                  List<Cart> cartItems = snapshot.data!;
-                  return SingleChildScrollView(
-                    child: Column(
-                      children: cartItems.map((cartItem) {
-                        return Center(
-                          child: Container(
-                            width:
-                                300.0, // Largura ajustável conforme necessário
-                            margin: EdgeInsets.all(8.0),
-                            padding: EdgeInsets.all(16.0),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12.0),
-                              border: Border.all(
-                                color: Colors.grey,
-                                width: 1.0,
-                              ),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  cartItem.nome,
-                                  style: TextStyle(
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold),
-                                  textAlign: TextAlign.center,
-                                ),
-                                SizedBox(height: 8.0),
-                                Text(
-                                  'R\$ ${cartItem.valor.toStringAsFixed(2)}',
-                                  style: TextStyle(fontSize: 16.0),
-                                ),
-                                SizedBox(height: 8.0),
-                                Text(
-                                  'Quantidade: ${cartItem.qtd}',
-                                  style: TextStyle(fontSize: 16.0),
-                                ),
-                                SizedBox(height: 16.0),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    ElevatedButton(
-                                      onPressed: () async {
-                                        bool success = await CartServiceRest()
-                                            .UpdateItemCart(cartItem.id,
-                                                (cartItem.qtd + 1));
-                                        if (success) {
-                                          setState(() {
-                                            cartItem.qtd += 1;
-                                            total = _calculateTotal(cartItems);
-                                          });
-                                        }
-                                      },
-                                      child: Icon(Icons.add),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () async {
-                                        if (cartItem.qtd == 1) {
-                                          return;
-                                        }
-
-                                        bool success = await CartServiceRest()
-                                            .UpdateItemCart(cartItem.id,
-                                                (cartItem.qtd - 1));
-                                        if (success) {
-                                          setState(() {
-                                            cartItem.qtd -= 1;
-                                            total = _calculateTotal(cartItems);
-                                          });
-                                        }
-                                      },
-                                      child: Icon(Icons.remove),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () async {
-                                        bool success = await CartServiceRest()
-                                            .DeleteItemCart(cartItem.id);
-                                        if (success) {
-                                          setState(() {
-                                            cartItems.remove(cartItem);
-                                            total = _calculateTotal(cartItems);
-                                          });
-                                        }
-                                      },
-                                      child: Icon(Icons.delete),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  );
-                }
-              },
-            ),
-          ),
-
-          // Campo Total
+          // Informações do usuário
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Total: R\$ ${total.toStringAsFixed(2)}',
-              style: TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold,
-              ),
+            child: Column(
+              children: [
+                // Nome do usuário
+                Text(
+                  '$userEmail',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+
+                // Círculo com ícone de usuário
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.person,
+                    size: 50,
+                    color: Colors.red,
+                  ),
+                ),
+                // Localização do usuário
+                SizedBox(height: 16),
+                Text(
+                  'Localização: $userLocation',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+
+                // Botão para obter localização
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () async {
+                    await _obterLocalizacao();
+                  },
+                  child: Text('Obter Localização'),
+                ),
+              ],
             ),
           ),
 
-          // Botão Pagamento
-          ElevatedButton(
-            onPressed: () {
-              // Lógica para processar o pagamento
-              // Implemente a lógica desejada aqui
-              // Pode abrir uma nova tela para o pagamento, chamar um serviço, etc.
-            },
-            child: Text('Pagamento'),
-          ),
+          // Lista de itens do carrinho
+          // ...
+
+          // Campo Total
+          // ...
         ],
       ),
       bottomNavigationBar: Container(
@@ -247,10 +294,24 @@ class _UserApp_pageState extends State<UserApp_page> {
             ),
           ],
           onTap: (int index) {
-            if (index == 3) {
+            if (index == 1) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => CartApp_page(),
+                ),
+              );
+            }
+            if (index == 0) {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => ProdutosApp_page(),
+                ),
+              );
+            }
+            if (index == 2) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => UserApp_page(),
                 ),
               );
             }

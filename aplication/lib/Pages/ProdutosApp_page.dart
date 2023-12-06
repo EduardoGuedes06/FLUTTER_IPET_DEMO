@@ -1,4 +1,5 @@
 import 'package:aplication/Pages/CartApp_page.dart';
+import 'package:aplication/Pages/UserApp_page.dart';
 import 'package:aplication/Service/UserCache.dart';
 import 'package:flutter/material.dart';
 import 'package:aplication/Models/Product.dart';
@@ -103,6 +104,20 @@ class _ProdutosApp_pageState extends State<ProdutosApp_page> {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => CartApp_page(),
+                  ),
+                );
+              }
+              if (index == 0) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ProdutosApp_page(),
+                  ),
+                );
+              }
+              if (index == 2) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => UserApp_page(),
                   ),
                 );
               }

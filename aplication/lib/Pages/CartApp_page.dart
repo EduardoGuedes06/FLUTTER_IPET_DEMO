@@ -1,3 +1,4 @@
+import 'package:aplication/Pages/UserApp_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:aplication/Models/Cart.dart';
@@ -324,10 +325,24 @@ class _CartApp_pageState extends State<CartApp_page> {
             ),
           ],
           onTap: (int index) {
+            if (index == 1) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => CartApp_page(),
+                ),
+              );
+            }
             if (index == 0) {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => ProdutosApp_page(),
+                ),
+              );
+            }
+            if (index == 2) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => UserApp_page(),
                 ),
               );
             }
