@@ -4,6 +4,7 @@ import 'package:aplication/Models/Cart.dart';
 import 'package:aplication/Pages/ProdutosApp_page.dart';
 import 'package:aplication/Service/CartCache.dart';
 import 'package:aplication/Service/RestService/CartServiceRest.dart';
+import 'package:aplication/Service/RestService/PaymentServiceRest.dart';
 import 'package:aplication/Service/UserCache.dart';
 
 class CartApp_page extends StatefulWidget {
@@ -19,6 +20,55 @@ class _CartApp_pageState extends State<CartApp_page> {
   void initState() {
     super.initState();
     cartItemsFuture = _loadCart();
+  }
+
+  void _limparCarrinho() {
+    setState(() {
+      total = 0.0;
+      cartItemsFuture = _loadCart();
+    });
+  }
+
+  Future<void> _confirmarCompra() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmar Compra'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Deseja confirmar a compra?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Não'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Sim'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _finalizarCompra();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _finalizarCompra() async {
+    final userCache = Provider.of<UserCache>(context, listen: false);
+    final loggedInUser = userCache.getLoggedInUser();
+    final userId = loggedInUser?.userId;
+    bool success = await PaymentServiceRest().finalizePayment(userId ?? '');
+
+    _limparCarrinho();
   }
 
   Future<List<Cart>> _loadCart() async {
@@ -44,6 +94,7 @@ class _CartApp_pageState extends State<CartApp_page> {
 
   @override
   Widget build(BuildContext context) {
+    final userCache = Provider.of<UserCache>(context, listen: false);
     return Scaffold(
       backgroundColor: Colors.red, // Fundo vermelho
       appBar: AppBar(
@@ -186,24 +237,50 @@ class _CartApp_pageState extends State<CartApp_page> {
           // Campo Total
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Total: R\$ ${total.toStringAsFixed(2)}',
-              style: TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Texto do Total
+                Text(
+                  'Total: R\$ ${total.toStringAsFixed(2)}',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white, // Definindo a cor do texto como branca
+                  ),
+                ),
 
-          // Botão Pagamento
-          ElevatedButton(
-            onPressed: () {
-              // Lógica para processar o pagamento
-              // Implemente a lógica desejada aqui
-              // Pode abrir uma nova tela para o pagamento, chamar um serviço, etc.
-            },
-            child: Text('Pagamento'),
-          ),
+                // Espaçamento entre o texto e o botão
+                SizedBox(height: 16.0),
+
+                // Botão Pagamento
+                ElevatedButton(
+                  onPressed: () async {
+                    await _confirmarCompra();
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.payment,
+                        color: Colors.white,
+                      ),
+                      SizedBox(width: 8.0),
+                      Text(
+                        'Pagamento',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red, // Cor de fundo vermelha
+                  ),
+                ),
+              ],
+            ),
+          )
         ],
       ),
       bottomNavigationBar: Container(
