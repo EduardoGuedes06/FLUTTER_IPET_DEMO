@@ -5,7 +5,6 @@ import 'package:aplication/Service/UserCache.dart';
 import 'package:aplication/Service/RestService/LoginServiceRest.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'MyHomeApp_page copy.dart';
 
 class LoginApp_page extends StatefulWidget {
   @override
@@ -27,16 +26,7 @@ class _LoginApp_page extends State<LoginApp_page> {
       body: Stack(
         children: [
           Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/wwwroot/fundo.jpg'),
-                fit: BoxFit.cover,
-                colorFilter: ColorFilter.mode(
-                  Color.fromARGB(249, 214, 176, 245).withOpacity(0.1),
-                  BlendMode.darken,
-                ),
-              ),
-            ),
+            decoration: BoxDecoration(),
           ),
           Center(
             child: Container(

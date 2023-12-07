@@ -1,6 +1,6 @@
 import 'package:aplication/Pages/CartApp_page.dart';
-import 'package:aplication/Pages/MyHomeApp_page%20copy.dart';
 import 'package:aplication/Pages/LoginApp_page.dart';
+import 'package:aplication/Pages/MyHomeApp_page.dart';
 import 'package:aplication/Pages/ProdutosApp_page.dart';
 import 'package:aplication/Pages/RegisterApp_page.dart';
 import 'package:aplication/Pages/UserApp_page.dart';

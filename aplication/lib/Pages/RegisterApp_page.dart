@@ -1,7 +1,7 @@
 import 'package:aplication/Pages/LoginApp_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'MyHomeApp_page copy.dart';
+import 'MyHomeApp_page.dart';
 import 'package:aplication/Service/UserRegister.dart';
 
 class Register_page extends StatefulWidget {
@@ -28,16 +28,7 @@ class _RegisterApp_page extends State<Register_page> {
       body: Stack(
         children: [
           Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/wwwroot/fundo.jpg'),
-                fit: BoxFit.cover,
-                colorFilter: ColorFilter.mode(
-                  Color.fromARGB(249, 214, 176, 245).withOpacity(0.1),
-                  BlendMode.darken,
-                ),
-              ),
-            ),
+            decoration: BoxDecoration(),
           ),
           Center(
             child: Container(

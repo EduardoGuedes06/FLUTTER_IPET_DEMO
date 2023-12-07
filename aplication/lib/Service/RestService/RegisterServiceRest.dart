@@ -10,7 +10,8 @@ class UserRegisterResponse {
 }
 
 class RegisterServiceRest {
-  final String apiUrl = 'https://localhost:7094/nova-conta-mobile';
+  final String apiUrl =
+      'https://apicoremobile.azurewebsites.net/nova-conta-mobile';
 
   Future<UserRegisterResponse?> Register(String Nome, String doc, String email,
       String password, String password_) async {

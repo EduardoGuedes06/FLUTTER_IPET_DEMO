@@ -9,7 +9,7 @@ class UserLoginResponse {
 }
 
 class LoginServiceRest {
-  final String apiUrl = 'https://localhost:7094/entrar-mobile';
+  final String apiUrl = 'https://apicoremobile.azurewebsites.net/entrar-mobile';
 
   Future<UserLoginResponse?> login(String email, String password) async {
     try {

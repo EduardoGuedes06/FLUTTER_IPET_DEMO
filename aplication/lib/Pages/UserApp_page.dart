@@ -7,9 +7,6 @@ import 'package:aplication/Service/CartCache.dart';
 import 'package:aplication/Service/RestService/CartServiceRest.dart';
 import 'package:aplication/Service/RestService/PaymentServiceRest.dart';
 import 'package:aplication/Service/UserCache.dart';
-import 'package:geolocator_web/geolocator_web.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
 
 class UserApp_page extends StatefulWidget {
   @override
@@ -100,8 +97,6 @@ class _UserApp_pageState extends State<UserApp_page> {
     setState(() {
       userEmail = loggedInUser?.email ?? '';
     });
-
-    await _obterLocalizacao();
   }
 
   double _calculateTotal(List<Cart> cartItems) {
@@ -110,61 +105,6 @@ class _UserApp_pageState extends State<UserApp_page> {
       sum += (item.valor * item.qtd);
     }
     return sum;
-  }
-
-  Future<Position> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
-    return await Geolocator.getCurrentPosition();
-  }
-
-  Future<void> _obterLocalizacao() async {
-    try {
-      Position position = await _determinePosition();
-
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
-      if (placemarks.isNotEmpty) {
-        Placemark placemark = placemarks.first;
-
-        // Exibir o endereço ou CEP
-        setState(() {
-          placemark.postalCode ?? 'Endereço desconhecido';
-        });
-      }
-      setState(() {
-        userLocation =
-            'Latitude: ${position.latitude}, Longitude: ${position.longitude}';
-      });
-    } catch (e) {
-      print('Erro ao obter a localização: $e');
-      setState(() {
-        userLocation = 'Erro ao obter a localização';
-      });
-    }
   }
 
   @override
@@ -237,9 +177,7 @@ class _UserApp_pageState extends State<UserApp_page> {
                 // Botão para obter localização
                 SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () async {
-                    await _obterLocalizacao();
-                  },
+                  onPressed: () async {},
                   child: Text('Obter Localização'),
                 ),
               ],

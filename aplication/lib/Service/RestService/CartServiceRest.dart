@@ -7,7 +7,8 @@ import 'package:aplication/Models/Product.dart';
 class CartServiceRest {
   //POST
   Future<bool> addToCart(String userId, Product product) async {
-    final String apiUrl = 'https://localhost:7094/adicionar-produto';
+    final String apiUrl =
+        'https://apicoremobile.azurewebsites.net/adicionar-produto';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -39,7 +40,8 @@ class CartServiceRest {
 
   //GET
   Future<List<Cart>> getCart(String user) async {
-    final String apiUrl = 'https://localhost:7094/obter-carrinho/' + user;
+    final String apiUrl =
+        'https://apicoremobile.azurewebsites.net/obter-carrinho/' + user;
 
     try {
       final response = await http.get(
@@ -71,7 +73,8 @@ class CartServiceRest {
 
   //DELETE
   Future<bool> DeleteItemCart(String id) async {
-    final String apiUrl = 'https://localhost:7094/remover-produto/' + id;
+    final String apiUrl =
+        'https://apicoremobile.azurewebsites.net/remover-produto/' + id;
 
     try {
       final response = await http.delete(
@@ -94,7 +97,7 @@ class CartServiceRest {
   //UPDATE
 
   Future<bool> UpdateItemCart(String id, int qtde) async {
-    final String apiUrl = 'https://localhost:7094/atualizar-quantidade/' +
+    final String apiUrl = 'https://127.0.0.1:7094/atualizar-quantidade/' +
         id +
         '/' +
         qtde.toString();

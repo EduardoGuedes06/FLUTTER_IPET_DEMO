@@ -72,56 +72,57 @@ class _ProdutosApp_pageState extends State<ProdutosApp_page> {
           ],
         ),
         child: BottomNavigationBar(
-            elevation: 0.0,
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
-            iconSize: 38.0,
-            items: <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.store,
-                  color: Colors.red,
-                ),
-                label: '',
+          elevation: 0.0,
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          iconSize: 38.0,
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.store,
+                color: Colors.red,
               ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.shopping_cart,
-                  color: Color.fromRGBO(255, 200, 200, 1.0),
-                ),
-                label: '',
+              label: '',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.shopping_cart,
+                color: Color.fromRGBO(255, 200, 200, 1.0),
               ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.person,
-                  color: Color.fromRGBO(255, 200, 200, 1.0),
-                ),
-                label: '',
+              label: '',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.person,
+                color: Color.fromRGBO(255, 200, 200, 1.0),
               ),
-            ],
-            onTap: (int index) {
-              if (index == 1) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => CartApp_page(),
-                  ),
-                );
-              }
-              if (index == 0) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => ProdutosApp_page(),
-                  ),
-                );
-              }
-              if (index == 2) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => UserApp_page(),
-                  ),
-                );
-              }
-            }),
+              label: '',
+            ),
+          ],
+          onTap: (int index) {
+            if (index == 1) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => CartApp_page(),
+                ),
+              );
+            }
+            if (index == 0) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ProdutosApp_page(),
+                ),
+              );
+            }
+            if (index == 2) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => UserApp_page(),
+                ),
+              );
+            }
+          },
+        ),
       ),
     );
   }

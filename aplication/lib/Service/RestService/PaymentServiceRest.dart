@@ -7,7 +7,8 @@ import 'package:aplication/Models/Product.dart';
 class PaymentServiceRest {
   //POST
   Future<bool> finalizePayment(String userId) async {
-    final String apiUrl = 'https://localhost:7094/finalizarCompra/' + userId;
+    final String apiUrl =
+        'https://apicoremobile.azurewebsites.net/finalizarCompra/' + userId;
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -32,7 +33,8 @@ class PaymentServiceRest {
 
   //GET
   Future<List<Cart>> getCart(String user) async {
-    final String apiUrl = 'https://localhost:7094/obter-carrinho/' + user;
+    final String apiUrl =
+        'https://apicoremobile.azurewebsites.net/obter-carrinho/' + user;
 
     try {
       final response = await http.get(
