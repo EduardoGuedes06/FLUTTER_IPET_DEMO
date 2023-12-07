@@ -1,4 +1,5 @@
 import 'package:aplication/Pages/UserApp_page.dart';
+import 'package:aplication/Service/Notificador.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:aplication/Models/Cart.dart';
@@ -7,6 +8,8 @@ import 'package:aplication/Service/CartCache.dart';
 import 'package:aplication/Service/RestService/CartServiceRest.dart';
 import 'package:aplication/Service/RestService/PaymentServiceRest.dart';
 import 'package:aplication/Service/UserCache.dart';
+
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class CartApp_page extends StatefulWidget {
   @override
@@ -69,6 +72,8 @@ class _CartApp_pageState extends State<CartApp_page> {
     final userId = loggedInUser?.userId;
     bool success = await PaymentServiceRest().finalizePayment(userId ?? '');
 
+    NotificationService().showNotification(
+        title: 'Carrinho Finalizado', body: 'Compra Realizada!');
     _limparCarrinho();
   }
 

@@ -3,6 +3,7 @@ import 'package:aplication/Models/Local.dart';
 import 'package:aplication/RouteGenerator.dart';
 import 'package:aplication/Service/CartCache.dart';
 import 'package:aplication/Service/LocalCache.dart';
+import 'package:aplication/Service/Notificador.dart';
 import 'package:aplication/Service/ProductsCache.dart';
 import 'package:aplication/Service/UserCache.dart';
 import 'package:aplication/Service/UserRegister.dart';
@@ -10,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  NotificationService().initNotification();
   runApp(
     MultiProvider(
       providers: [
