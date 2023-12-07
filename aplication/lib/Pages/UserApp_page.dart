@@ -1,15 +1,19 @@
+import 'package:aplication/Models/User.dart';
+import 'package:aplication/Service/LocalCache.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:aplication/Models/Cart.dart';
-import 'package:aplication/Models/Payment.dart'; // Importe a classe Payment
+import 'package:aplication/Models/Payment.dart';
 import 'package:aplication/Pages/CartApp_page.dart';
 import 'package:aplication/Pages/ProdutosApp_page.dart';
 import 'package:aplication/Service/CartCache.dart';
 import 'package:aplication/Service/RestService/CartServiceRest.dart';
 import 'package:aplication/Service/RestService/PaymentServiceRest.dart';
 import 'package:aplication/Service/UserCache.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 class UserApp_page extends StatefulWidget {
   @override
@@ -17,9 +21,8 @@ class UserApp_page extends StatefulWidget {
 }
 
 class _UserApp_pageState extends State<UserApp_page> {
-  late Future<List<Payment>> paymentsFuture; // Alterado para Payment
+  late Future<List<Payment>> paymentsFuture;
   double total = 0.0;
-
   @override
   void initState() {
     super.initState();
@@ -108,19 +111,30 @@ class _UserApp_pageState extends State<UserApp_page> {
   }
 
   String _formatDateTime(String dateString) {
-    // Converter a string para DateTime
     DateTime dateTime = DateTime.parse(dateString);
-
-    // Formatando a data e hora
     String formattedDateTime =
         "${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute}";
 
     return formattedDateTime;
   }
 
+  Future<void> _updateLocation() async {
+    try {
+      await Provider.of<LocalCache>(context, listen: false).updateLocation();
+    } catch (e) {
+      print("Erro ao obter localização: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final userCache = Provider.of<UserCache>(context, listen: false);
+    final localCache = Provider.of<LocalCache>(context);
+
+    String _localizacao = localCache.location;
+    User? _user = userCache.getLoggedInUser();
+    final String email = _user?.email ?? "Email desconhecido";
+
     return Scaffold(
       backgroundColor: Colors.red,
       appBar: AppBar(
@@ -152,7 +166,7 @@ class _UserApp_pageState extends State<UserApp_page> {
               child: Column(
                 children: [
                   Text(
-                    'Nome do Usuário',
+                    email,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -174,7 +188,7 @@ class _UserApp_pageState extends State<UserApp_page> {
                   ),
                   SizedBox(height: 16),
                   Text(
-                    'Localização: Local do Usuário',
+                    _localizacao,
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white,
@@ -182,7 +196,9 @@ class _UserApp_pageState extends State<UserApp_page> {
                   ),
                   SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () async {},
+                    onPressed: () async {
+                      await _updateLocation();
+                    },
                     child: Text('Obter Localização'),
                   ),
                   SizedBox(height: 16),
