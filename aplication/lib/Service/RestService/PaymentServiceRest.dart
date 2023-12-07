@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:aplication/Models/Cart.dart';
+import 'package:aplication/Models/Payment.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 import 'package:aplication/Models/Product.dart';
@@ -32,9 +33,9 @@ class PaymentServiceRest {
   }
 
   //GET
-  Future<List<Cart>> getCart(String user) async {
+  Future<List<Payment>> getPayment(String user) async {
     final String apiUrl =
-        'https://apicoremobile.azurewebsites.net/obter-carrinho/' + user;
+        'https://apicoremobile.azurewebsites.net/obter-compras/' + user;
 
     try {
       final response = await http.get(
@@ -48,9 +49,8 @@ class PaymentServiceRest {
         final List<dynamic> data = jsonDecode(response.body);
 
         return data
-            .map((item) => Cart(
+            .map((item) => Payment(
                   id: item['id'],
-                  nome: item['nomeProduto'],
                   valor: item['valor'].toDouble(),
                   data: item['dataCadastro'],
                   qtd: item['qtde'],

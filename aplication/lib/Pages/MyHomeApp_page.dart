@@ -41,7 +41,7 @@ class MyHomeApp_page extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Container(
-                  padding: const EdgeInsets.only(top: 100.0),
+                  padding: const EdgeInsets.only(top: 80.0),
                   child: Image.asset('assets/wwwroot/patinha.png'),
                 ),
                 Expanded(

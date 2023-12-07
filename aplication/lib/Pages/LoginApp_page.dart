@@ -42,11 +42,11 @@ class _LoginApp_page extends State<LoginApp_page> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Container(
-                    padding: const EdgeInsets.only(top: 75.0),
+                    padding: const EdgeInsets.only(top: 65.0),
                     child: Image.asset('assets/wwwroot/patinha.png'),
                   ),
                   Expanded(
-                    flex: 2,
+                    flex: 1,
                     child: Center(
                       child: Text(
                         'IPET',
@@ -59,7 +59,7 @@ class _LoginApp_page extends State<LoginApp_page> {
                     ),
                   ),
                   Expanded(
-                    flex: 5,
+                    flex: 4,
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: Form(
@@ -80,8 +80,7 @@ class _LoginApp_page extends State<LoginApp_page> {
                             TextFormField(
                               controller: passwordController,
                               obscureText: true,
-                              decoration:
-                                  InputDecoration(labelText: 'Password'),
+                              decoration: InputDecoration(labelText: 'Senha'),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Senha';
@@ -89,7 +88,6 @@ class _LoginApp_page extends State<LoginApp_page> {
                                 return null;
                               },
                             ),
-                            SizedBox(height: 20),
                             // Add additional SizedBox for increased spacing
                             SizedBox(height: 20),
                             ElevatedButton(

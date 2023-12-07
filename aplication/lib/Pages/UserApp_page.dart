@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:aplication/Models/Cart.dart';
+import 'package:aplication/Models/Payment.dart'; // Importe a classe Payment
 import 'package:aplication/Pages/CartApp_page.dart';
 import 'package:aplication/Pages/ProdutosApp_page.dart';
 import 'package:aplication/Service/CartCache.dart';
@@ -14,37 +17,33 @@ class UserApp_page extends StatefulWidget {
 }
 
 class _UserApp_pageState extends State<UserApp_page> {
-  late Future<List<Cart>> cartItemsFuture;
+  late Future<List<Payment>> paymentsFuture; // Alterado para Payment
   double total = 0.0;
-
-  // Variáveis para armazenar informações do usuário
-  String userEmail = '';
-  String userLocation = '';
 
   @override
   void initState() {
     super.initState();
-    cartItemsFuture = _loadCart();
+    paymentsFuture = _loadPayments();
     _loadUserInfo();
   }
 
   void _limparCarrinho() {
     setState(() {
       total = 0.0;
-      cartItemsFuture = _loadCart();
+      paymentsFuture = _loadPayments();
     });
   }
 
-  Future<void> _confirmarCompra() async {
+  Future<void> _confirmarPagamento() async {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirmar Compra'),
+          title: Text('Confirmar Pagamento'),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('Deseja confirmar a compra?'),
+                Text('Deseja confirmar o pagamento?'),
               ],
             ),
           ),
@@ -59,7 +58,7 @@ class _UserApp_pageState extends State<UserApp_page> {
               child: Text('Sim'),
               onPressed: () {
                 Navigator.of(context).pop();
-                _finalizarCompra();
+                _finalizarPagamento();
               },
             ),
           ],
@@ -68,7 +67,7 @@ class _UserApp_pageState extends State<UserApp_page> {
     );
   }
 
-  Future<void> _finalizarCompra() async {
+  Future<void> _finalizarPagamento() async {
     final userCache = Provider.of<UserCache>(context, listen: false);
     final loggedInUser = userCache.getLoggedInUser();
     final userId = loggedInUser?.userId;
@@ -77,17 +76,18 @@ class _UserApp_pageState extends State<UserApp_page> {
     _limparCarrinho();
   }
 
-  Future<List<Cart>> _loadCart() async {
+  Future<List<Payment>> _loadPayments() async {
     final userCache = Provider.of<UserCache>(context, listen: false);
     final loggedInUser = userCache.getLoggedInUser();
     final userId = loggedInUser?.userId;
 
-    List<Cart> cartItems = await CartServiceRest().getCart(userId ?? '');
+    List<Payment> payments =
+        await PaymentServiceRest().getPayment(userId ?? '');
     setState(() {
-      total = _calculateTotal(cartItems);
+      total = _calculateTotalPayments(payments);
     });
 
-    return cartItems;
+    return payments;
   }
 
   Future<void> _loadUserInfo() async {
@@ -95,23 +95,34 @@ class _UserApp_pageState extends State<UserApp_page> {
     final loggedInUser = userCache.getLoggedInUser();
 
     setState(() {
-      userEmail = loggedInUser?.email ?? '';
+      // Adapte conforme necessário com as informações do usuário
     });
   }
 
-  double _calculateTotal(List<Cart> cartItems) {
+  double _calculateTotalPayments(List<Payment> payments) {
     double sum = 0.0;
-    for (var item in cartItems) {
-      sum += (item.valor * item.qtd);
+    for (var payment in payments) {
+      sum += (payment.valor * payment.qtd);
     }
     return sum;
+  }
+
+  String _formatDateTime(String dateString) {
+    // Converter a string para DateTime
+    DateTime dateTime = DateTime.parse(dateString);
+
+    // Formatando a data e hora
+    String formattedDateTime =
+        "${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute}";
+
+    return formattedDateTime;
   }
 
   @override
   Widget build(BuildContext context) {
     final userCache = Provider.of<UserCache>(context, listen: false);
     return Scaffold(
-      backgroundColor: Colors.red, // Fundo vermelho
+      backgroundColor: Colors.red,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -132,77 +143,138 @@ class _UserApp_pageState extends State<UserApp_page> {
         ),
         centerTitle: true,
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Informações do usuário
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                // Nome do usuário
-                Text(
-                  '$userEmail',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+      body: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Text(
+                    'Nome do Usuário',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-
-                // Círculo com ícone de usuário
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.person,
+                      size: 50,
+                      color: Colors.red,
+                    ),
                   ),
-                  child: Icon(
-                    Icons.person,
-                    size: 50,
-                    color: Colors.red,
+                  SizedBox(height: 16),
+                  Text(
+                    'Localização: Local do Usuário',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-                // Localização do usuário
-                SizedBox(height: 16),
-                Text(
-                  'Localização: $userLocation',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () async {},
+                    child: Text('Obter Localização'),
                   ),
-                ),
-
-                // Botão para obter localização
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () async {},
-                  child: Text('Obter Localização'),
-                ),
-              ],
+                  SizedBox(height: 16),
+                  Text(
+                    'Histórico de Compras',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-
-          // Lista de itens do carrinho
-          // ...
-
-          // Campo Total
-          // ...
-        ],
+            Expanded(
+              child: FutureBuilder<List<Payment>>(
+                future: paymentsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Erro: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('Nenhum item no histórico.'));
+                  } else {
+                    List<Payment> payments = snapshot.data!;
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: payments.map((payment) {
+                          return Center(
+                            child: Container(
+                              width: 300.0,
+                              margin: EdgeInsets.all(8.0),
+                              padding: EdgeInsets.all(16.0),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12.0),
+                                border: Border.all(
+                                  color: Colors.grey,
+                                  width: 1.0,
+                                ),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Data ${_formatDateTime(payment.data)}',
+                                    style: TextStyle(
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  SizedBox(height: 8.0),
+                                  Text(
+                                    'R\$ ${payment.valor.toStringAsFixed(2)}',
+                                    style: TextStyle(fontSize: 16.0),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Total: R\$ ${total.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
       bottomNavigationBar: Container(
         height: 100.0,
-        decoration: BoxDecoration(
-          color: Color.fromRGBO(222, 218, 245, 1.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              offset: Offset(0, -1),
-              blurRadius: 30.0,
-            ),
-          ],
-        ),
         child: BottomNavigationBar(
           elevation: 0.0,
           showSelectedLabels: false,
