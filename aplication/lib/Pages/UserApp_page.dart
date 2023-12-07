@@ -102,7 +102,7 @@ class _UserApp_pageState extends State<UserApp_page> {
   double _calculateTotalPayments(List<Payment> payments) {
     double sum = 0.0;
     for (var payment in payments) {
-      sum += (payment.valor * payment.qtd);
+      sum += (payment.valor);
     }
     return sum;
   }

@@ -97,10 +97,11 @@ class CartServiceRest {
   //UPDATE
 
   Future<bool> UpdateItemCart(String id, int qtde) async {
-    final String apiUrl = 'https://127.0.0.1:7094/atualizar-quantidade/' +
-        id +
-        '/' +
-        qtde.toString();
+    final String apiUrl =
+        'https://apicoremobile.azurewebsites.net/atualizar-quantidade/' +
+            id +
+            '/' +
+            qtde.toString();
 
     try {
       final response = await http.put(

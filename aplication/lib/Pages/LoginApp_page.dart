@@ -23,12 +23,11 @@ class _LoginApp_page extends State<LoginApp_page> {
     final userCache = context.watch<UserCache>();
 
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(),
-          ),
-          Center(
+      resizeToAvoidBottomInset: true,
+      body: SingleChildScrollView(
+        child: Container(
+          decoration: BoxDecoration(),
+          child: Center(
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -45,139 +44,129 @@ class _LoginApp_page extends State<LoginApp_page> {
                     padding: const EdgeInsets.only(top: 65.0),
                     child: Image.asset('assets/wwwroot/patinha.png'),
                   ),
-                  Expanded(
-                    flex: 1,
-                    child: Center(
-                      child: Text(
-                        'IPET',
-                        style: TextStyle(
-                          fontSize: 65,
-                          fontWeight: FontWeight.bold,
-                          color: const Color.fromRGBO(255, 213, 213, 1.0),
-                        ),
+                  Center(
+                    child: Text(
+                      'IPET',
+                      style: TextStyle(
+                        fontSize: 65,
+                        fontWeight: FontWeight.bold,
+                        color: const Color.fromRGBO(255, 213, 213, 1.0),
                       ),
                     ),
                   ),
-                  Expanded(
-                    flex: 4,
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Form(
-                        key: _formKey,
-                        autovalidateMode: _autovalidateMode,
-                        child: Column(
-                          children: [
-                            TextFormField(
-                              controller: emailController,
-                              decoration: InputDecoration(labelText: 'E-mail'),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Email';
-                                }
-                                return null;
-                              },
-                            ),
-                            TextFormField(
-                              controller: passwordController,
-                              obscureText: true,
-                              decoration: InputDecoration(labelText: 'Senha'),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Senha';
-                                }
-                                return null;
-                              },
-                            ),
-                            // Add additional SizedBox for increased spacing
-                            SizedBox(height: 20),
-                            ElevatedButton(
-                              onPressed: () async {
-                                setState(() {
-                                  _autovalidateMode = AutovalidateMode.always;
-                                });
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Form(
+                      key: _formKey,
+                      autovalidateMode: _autovalidateMode,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: emailController,
+                            decoration: InputDecoration(labelText: 'E-mail'),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Email';
+                              }
+                              return null;
+                            },
+                          ),
+                          TextFormField(
+                            controller: passwordController,
+                            obscureText: true,
+                            decoration: InputDecoration(labelText: 'Senha'),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Senha';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: () async {
+                              setState(() {
+                                _autovalidateMode = AutovalidateMode.always;
+                              });
 
-                                if (_formKey.currentState!.validate()) {
-                                  final loginSuccessful =
-                                      await userCache.loginUser(
-                                    emailController.text,
-                                    passwordController.text,
+                              if (_formKey.currentState!.validate()) {
+                                final loginSuccessful =
+                                    await userCache.loginUser(
+                                  emailController.text,
+                                  passwordController.text,
+                                );
+
+                                if (loginSuccessful) {
+                                  Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                      builder: (context) => ProdutosApp_page(),
+                                    ),
                                   );
-
-                                  if (loginSuccessful) {
-                                    Navigator.of(context).pushReplacement(
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            ProdutosApp_page(),
-                                      ),
-                                    );
-                                  } else {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                        title: Text('Erro no Login'),
-                                        content:
-                                            Text('Credenciais Incorretas.'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: Text('OK'),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }
+                                } else {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: Text('Erro no Login'),
+                                      content: Text('Credenciais Incorretas.'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text('OK'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
                                 }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                primary:
-                                    const Color.fromRGBO(255, 213, 213, 1.0),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                ),
-                                minimumSize: const Size(300, 60),
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              primary: const Color.fromRGBO(255, 213, 213, 1.0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0),
                               ),
-                              child: const Text(
-                                'Login',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 17,
-                                ),
+                              minimumSize: const Size(300, 60),
+                            ),
+                            child: const Text(
+                              'Login',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
                               ),
                             ),
-                            const SizedBox(height: 30),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Text(
-                                  'Não tem conta? ',
+                          ),
+                          SizedBox(height: 30),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Text(
+                                'Não tem conta? ',
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                      builder: (context) => Register_page(),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  'Cadastro',
                                   style: TextStyle(
                                     fontSize: 17,
+                                    fontWeight: FontWeight.bold,
                                     color: Colors.black,
                                   ),
                                 ),
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.of(context).pushReplacement(
-                                      MaterialPageRoute(
-                                        builder: (context) => Register_page(),
-                                      ),
-                                    );
-                                  },
-                                  child: Text(
-                                    'Cadastro',
-                                    style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -185,7 +174,7 @@ class _LoginApp_page extends State<LoginApp_page> {
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }

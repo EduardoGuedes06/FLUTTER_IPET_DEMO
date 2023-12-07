@@ -38,7 +38,7 @@ class ProductsCache extends ChangeNotifier {
     ),
     Product(
       id: '00000000-0000-0000-0000-000000000006',
-      nome: 'Brinquedo para Gato',
+      nome: 'Brinquedo Gato',
       valor: 35.0,
       image: 'racao.jpg',
     ),

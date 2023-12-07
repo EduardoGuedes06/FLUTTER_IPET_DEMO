@@ -151,59 +151,49 @@ class ProductTile extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Image.asset(
-            'assets/wwwroot/Produtos/${product.image}',
-            width: 120,
-            height: 120,
-          ),
           Text(
             product.nome,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16.0),
           ),
-          Text(
-            'R\$ ${product.valor.toStringAsFixed(2)}',
-            style: TextStyle(fontSize: 16.0),
+          Image.asset(
+            'assets/wwwroot/Produtos/${product.image}',
+            width: 80,
+            height: 80,
           ),
-          ElevatedButton(
-            onPressed: () async {
-              // Obtém o ID do usuário conectado
-              final loggedInUser = userCache.getLoggedInUser();
-              final userId = loggedInUser?.userId;
-
-              // Adiciona o item ao carrinho com o ID do usuário
-              if (userId != null) {
-                carrinhoCache.addToCart(userId, product);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Produto adicionado ao carrinho!'),
-                  ),
-                );
-              } else {
-                // Trate o caso em que o usuário não está conectado
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                        'Você precisa estar conectado para adicionar produtos ao carrinho.'),
-                  ),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              primary: Colors.blue,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'R\$ ${product.valor.toStringAsFixed(2)}',
+                style: TextStyle(fontSize: 14.0),
               ),
-              minimumSize: Size(40, 20),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.shopping_cart),
-                SizedBox(width: 3.0),
-                Text('Adicionar'),
-              ],
-            ),
+              SizedBox(width: 10.0),
+              GestureDetector(
+                onTap: () async {
+                  final loggedInUser = userCache.getLoggedInUser();
+                  final userId = loggedInUser?.userId;
+
+                  if (userId != null) {
+                    carrinhoCache.addToCart(userId, product);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Produto adicionado ao carrinho!'),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Você precisa estar conectado para adicionar produtos ao carrinho.',
+                        ),
+                      ),
+                    );
+                  }
+                },
+                child: Icon(Icons.shopping_cart, color: Colors.red),
+              ),
+            ],
           ),
         ],
       ),
