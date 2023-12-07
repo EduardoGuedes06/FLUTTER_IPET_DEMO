@@ -18,7 +18,7 @@ class _RegisterApp_page extends State<Register_page> {
   TextEditingController senhaController_ = TextEditingController();
   AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
 
-  double backgroundOpacity = 0.5; // Opacidade inicial do fundo
+  double backgroundOpacity = 0.5;
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +27,7 @@ class _RegisterApp_page extends State<Register_page> {
     return Scaffold(
       body: Center(
         child: AnimatedContainer(
-          duration: Duration(
-              milliseconds: 500), // Duração da animação em milissegundos
+          duration: Duration(milliseconds: 500),
           width: 300,
           height: 620,
           decoration: BoxDecoration(
@@ -111,13 +110,12 @@ class _RegisterApp_page extends State<Register_page> {
                 ),
               ),
               Positioned(
-                bottom: 30, // Ajuste conforme necessário
+                bottom: 30,
                 left: 20,
                 child: ElevatedButton(
                   onPressed: () async {
                     setState(() {
                       _autovalidateMode = AutovalidateMode.always;
-                      // Altera a opacidade ao pressionar o botão (pode ajustar conforme necessário)
                       backgroundOpacity = 0.2;
                     });
 
@@ -174,16 +172,15 @@ class _RegisterApp_page extends State<Register_page> {
                 ),
               ),
               Positioned(
-                bottom: -10, // Posição inferior da mensagem
+                bottom: -10,
                 left: 20,
                 child: Row(
                   children: [
                     Positioned(
-                      bottom: 0, // Posição inferior da mensagem
+                      bottom: 0,
                       left: 20,
                       child: Padding(
-                        padding: EdgeInsets.all(
-                            10.0), // Adiciona um espaçamento de 8 pixels em todos os lados
+                        padding: EdgeInsets.all(10.0),
                         child: Row(
                           children: [
                             Text(
@@ -206,8 +203,7 @@ class _RegisterApp_page extends State<Register_page> {
                                 style: TextStyle(
                                   fontSize: 17,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors
-                                      .blue, // Altere a cor conforme necessário
+                                  color: Colors.blue,
                                 ),
                               ),
                             ),

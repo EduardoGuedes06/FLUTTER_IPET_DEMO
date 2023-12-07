@@ -17,7 +17,7 @@ class _ProdutosApp_pageState extends State<ProdutosApp_page> {
     final List<Product> products = ProductsCache.getProducts();
 
     return Scaffold(
-      backgroundColor: Colors.red, // Fundo vermelho
+      backgroundColor: Colors.red,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -26,9 +26,7 @@ class _ProdutosApp_pageState extends State<ProdutosApp_page> {
             Icons.arrow_back,
             color: Colors.white,
           ),
-          onPressed: () {
-            // Adicione a navegação para a página anterior aqui
-          },
+          onPressed: () {},
         ),
         title: Text(
           'Produtos',

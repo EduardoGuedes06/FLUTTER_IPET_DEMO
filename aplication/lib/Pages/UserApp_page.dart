@@ -97,9 +97,7 @@ class _UserApp_pageState extends State<UserApp_page> {
     final userCache = Provider.of<UserCache>(context, listen: false);
     final loggedInUser = userCache.getLoggedInUser();
 
-    setState(() {
-      // Adapte conforme necessário com as informações do usuário
-    });
+    setState(() {});
   }
 
   double _calculateTotalPayments(List<Payment> payments) {
@@ -227,8 +225,7 @@ class _UserApp_pageState extends State<UserApp_page> {
                         'Nenhum item comprado.',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize:
-                              24, // Tamanho da fonte, ajuste conforme necessário
+                          fontSize: 24,
                         ),
                       ),
                     );

@@ -102,7 +102,7 @@ class _CartApp_pageState extends State<CartApp_page> {
   Widget build(BuildContext context) {
     final userCache = Provider.of<UserCache>(context, listen: false);
     return Scaffold(
-      backgroundColor: Colors.red, // Fundo vermelho
+      backgroundColor: Colors.red,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -125,7 +125,6 @@ class _CartApp_pageState extends State<CartApp_page> {
       ),
       body: Column(
         children: [
-          // Lista de itens do carrinho
           Expanded(
             child: FutureBuilder<List<Cart>>(
               future: cartItemsFuture,
@@ -140,8 +139,7 @@ class _CartApp_pageState extends State<CartApp_page> {
                       'Nenhum item no carrinho.',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize:
-                            24, // Tamanho da fonte, ajuste conforme necessário
+                        fontSize: 24,
                       ),
                     ),
                   );
@@ -152,8 +150,7 @@ class _CartApp_pageState extends State<CartApp_page> {
                       children: cartItems.map((cartItem) {
                         return Center(
                           child: Container(
-                            width:
-                                300.0, // Largura ajustável conforme necessário
+                            width: 300.0,
                             margin: EdgeInsets.all(8.0),
                             padding: EdgeInsets.all(16.0),
                             decoration: BoxDecoration(
@@ -248,27 +245,20 @@ class _CartApp_pageState extends State<CartApp_page> {
               },
             ),
           ),
-
-          // Campo Total
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Texto do Total
                 Text(
                   'Total: R\$ ${total.toStringAsFixed(2)}',
                   style: TextStyle(
                     fontSize: 20.0,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white, // Definindo a cor do texto como branca
+                    color: Colors.white,
                   ),
                 ),
-
-                // Espaçamento entre o texto e o botão
                 SizedBox(height: 16.0),
-
-                // Botão Pagamento
                 ElevatedButton(
                   onPressed: () async {
                     await _confirmarCompra();
@@ -290,7 +280,7 @@ class _CartApp_pageState extends State<CartApp_page> {
                     ],
                   ),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.red, // Cor de fundo vermelha
+                    primary: Colors.red,
                   ),
                 ),
               ],
