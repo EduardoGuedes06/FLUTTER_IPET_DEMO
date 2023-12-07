@@ -206,7 +206,16 @@ class _UserApp_pageState extends State<UserApp_page> {
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Erro: ${snapshot.error}'));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('Nenhum item no histórico.'));
+                    return Center(
+                      child: Text(
+                        'Nenhum item comprado.',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize:
+                              24, // Tamanho da fonte, ajuste conforme necessário
+                        ),
+                      ),
+                    );
                   } else {
                     List<Payment> payments = snapshot.data!;
                     return SingleChildScrollView(

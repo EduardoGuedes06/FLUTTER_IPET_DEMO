@@ -130,7 +130,16 @@ class _CartApp_pageState extends State<CartApp_page> {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Erro: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('Nenhum item no carrinho.'));
+                  return Center(
+                    child: Text(
+                      'Nenhum item no carrinho.',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize:
+                            24, // Tamanho da fonte, ajuste conforme necessário
+                      ),
+                    ),
+                  );
                 } else {
                   List<Cart> cartItems = snapshot.data!;
                   return SingleChildScrollView(
